@@ -1,6 +1,4 @@
-//
 // FASE 1: Modelagem dos dados (Classe Base)
-//
 class Produto {
     constructor(nome, preco, quantidade) {
         this.nome = nome;
@@ -14,25 +12,17 @@ class Produto {
     }
 }
 
-//
-// FASE 2: Gerenciamento de Estado (Memória e Edição)
-//
+// FASE 2: Gerenciamento de Estado (Memória)
 const listaDeProdutos = [];
-
-// Estado auxiliar: null indica "Modo Inclusão", número indica "Modo Edição"
-let indiceEdicao = null;
-
-// Chave para persistência no navegador
 const CHAVE_STORAGE = "sistema_estoque_produtos";
 
-//
-// FASE 2.1: Persistência com localStorage
-//
+// 1. Função para SALVAR os dados no navegador
 function salvarNoLocalStorage() {
     const listaEmTexto = JSON.stringify(listaDeProdutos);
     localStorage.setItem(CHAVE_STORAGE, listaEmTexto);
 }
 
+// 2. Função para CARREGAR os dados salvos quando a página abrir
 function carregarDoLocalStorage() {
     const dadosSalvos = localStorage.getItem(CHAVE_STORAGE);
 
@@ -46,80 +36,54 @@ function carregarDoLocalStorage() {
     }
 }
 
-//
 // FASE 3: Captura de Elementos do DOM
-//
 const formProduto = document.getElementById("produto-form");
-const btnSubmit = formProduto.querySelector("button[type='submit']");
 const btnLimparTudo = document.getElementById("limpar-tabela");
 const totalEstoqueEl = document.getElementById("total-estoque");
+const nomeInput = document.getElementById("nome");
+const precoInput = document.getElementById("preco");
+const quantidadeInput = document.getElementById("quantidade");
+const datalistProdutos = document.getElementById("produtos-sugeridos");
 
-//
-// FASE 4: Função para Transferir Estado para Modo Edição
-//
-function prepararEdicao(index) {
-    const produto = listaDeProdutos[index];
+// FASE 4: Escuta de Eventos
 
-    // 1. Preenche os campos do formulário com os dados do registro selecionado
-    document.getElementById("nome").value = produto.nome;
-    document.getElementById("preco").value = produto.preco;
-    document.getElementById("quantidade").value = produto.quantidade;
-
-    // 2. Atualiza a variável global de controle e altera o texto do botão
-    indiceEdicao = index;
-    btnSubmit.textContent = "Salvar Alterações";
-    btnSubmit.classList.add("btn-warning");
-}
-
-//
-// FASE 5: Escuta de Eventos
-//
-
-// 1. Evento Submit do Formulário com Validações (Guard Clauses) e Fluxo Update
+// 1. Adicionar ou Editar Produto pelo Formulário
 formProduto.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    // Sanitização e Captura dos Valores
-    const nome = document.getElementById("nome").value.trim();
-    const preco = parseFloat(document.getElementById("preco").value);
-    const quantidade = parseInt(document.getElementById("quantidade").value);
+    const nomeVal = nomeInput.value.trim();
+    const precoVal = precoInput.value;
+    const quantidadeVal = quantidadeInput.value;
 
-    // Guard Clause 1: Validação do nome
-    if (!nome) {
-        alert("Por favor, informe um nome válido para o produto.");
-        return;
+    // Se o produto já existir na lista, removemos a versão antiga antes de inserir a nova
+    const indexExistente = listaDeProdutos.findIndex(p => p.nome.toLowerCase() === nomeVal.toLowerCase());
+    if (indexExistente !== -1) {
+        listaDeProdutos.splice(indexExistente, 1);
     }
 
-    // Guard Clause 2: Checagem de Limites Numéricos
-    if (isNaN(preco) || preco <= 0 || isNaN(quantidade) || quantidade <= 0) {
-        alert("O preço e a quantidade devem ser valores numéricos maiores que zero.");
-        return;
-    }
+    const novoProduto = new Produto(nomeVal, precoVal, quantidadeVal);
+    listaDeProdutos.push(novoProduto);
 
-    // Instancia o novo produto com dados validados
-    const produtoValido = new Produto(nome, preco, quantidade);
-
-    // Lógica de Persistência em Memória: Inclusão vs. Alteração (Update)
-    if (indiceEdicao === null) {
-        // Modo Inclusão
-        listaDeProdutos.push(produtoValido);
-    } else {
-        // Modo Edição (Update)
-        listaDeProdutos[indiceEdicao] = produtoValido;
-        
-        // Restaura o estado original de cadastro
-        indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
-    }
-
-    // Sincroniza com localStorage, limpa o formulário e atualiza a interface
     salvarNoLocalStorage();
-    formProduto.reset();
     atualizarInterface();
+    formProduto.reset();
 });
 
-// 2. Limpar Toda a Tabela
+// 2. Detectar quando o usuário digita/seleciona um produto existente da lista
+nomeInput.addEventListener("input", function () {
+    const termoBuscado = nomeInput.value.trim().toLowerCase();
+    
+    // Procura se o texto bate exatamente com algum produto da lista
+    const produtoEncontrado = listaDeProdutos.find(p => p.nome.toLowerCase() === termoBuscado);
+    
+    // Se encontrar, preenche os inputs de preço e quantidade automaticamente
+    if (produtoEncontrado) {
+        precoInput.value = produtoEncontrado.preco;
+        quantidadeInput.value = produtoEncontrado.quantidade;
+    }
+});
+
+// 3. Limpar toda a tabela
 btnLimparTudo.addEventListener("click", function () {
     if (listaDeProdutos.length === 0) {
         alert("A tabela já está vazia!");
@@ -129,35 +93,31 @@ btnLimparTudo.addEventListener("click", function () {
     if (confirm("Tem certeza que deseja remover todos os produtos?")) {
         listaDeProdutos.length = 0;
         localStorage.removeItem(CHAVE_STORAGE);
-        
-        // Restaura estado se estivesse editando
-        indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
-
-        formProduto.reset();
         atualizarInterface();
+        formProduto.reset();
     }
 });
 
-//
-// FASE 6: Funções de Atualização e Renderização da Interface
-//
+// FASE 5: Funções de Atualização e Renderização da Interface
+
+// Função para atualizar dinamicamente a lista de sugestões enquanto o usuário digita
+function atualizarDatalist() {
+    datalistProdutos.innerHTML = "";
+    listaDeProdutos.forEach(produto => {
+        const option = document.createElement("option");
+        option.value = produto.nome;
+        datalistProdutos.appendChild(option);
+    });
+}
+
+// Função responsável por remover um único produto pelo índice
 function removerProduto(index) {
     listaDeProdutos.splice(index, 1);
-
-    // Caso o item excluído seja o que estava em edição, reseta o estado
-    if (indiceEdicao === index) {
-        indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
-        formProduto.reset();
-    }
-
     salvarNoLocalStorage();
     atualizarInterface();
 }
 
+// Função responsável por calcular e renderizar o total geral em estoque
 function atualizarTotalEstoque() {
     const total = listaDeProdutos.reduce((acc, produto) => {
         return acc + produto.calcularSubtotal();
@@ -166,6 +126,7 @@ function atualizarTotalEstoque() {
     totalEstoqueEl.textContent = `Total em Estoque: R$ ${total.toFixed(2)}`;
 }
 
+// Função responsável por re-desenhar a tabela
 function renderizarTabela() {
     const tabelaBody = document.querySelector("#tabela-produtos tbody");
     tabelaBody.innerHTML = "";
@@ -179,14 +140,9 @@ function renderizarTabela() {
             <td>${produto.quantidade}</td>
             <td>R$ ${produto.calcularSubtotal().toFixed(2)}</td>
             <td>
-                <button class="btn-editar">Editar</button>
                 <button class="btn-remover">Remover</button>
             </td>
         `;
-
-        // Eventos dos botões da coluna de ações
-        const btnEditar = linha.querySelector(".btn-editar");
-        btnEditar.addEventListener("click", () => prepararEdicao(index));
 
         const btnRemover = linha.querySelector(".btn-remover");
         btnRemover.addEventListener("click", () => removerProduto(index));
@@ -195,13 +151,13 @@ function renderizarTabela() {
     });
 }
 
+// Função principal que sincroniza a tela com os dados e as sugestões
 function atualizarInterface() {
     renderizarTabela();
     atualizarTotalEstoque();
+    atualizarDatalist();
 }
 
-//
-// FASE 7: Inicialização da Aplicação
-//
+// FASE 6: Inicialização da Aplicação
 carregarDoLocalStorage();
 atualizarInterface();
