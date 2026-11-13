@@ -1,101 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Controle de estoque com cadastro, edição e persistência local de produtos.">
-    <title>Controle de Estoque — V5</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Controle de estoque com cadastro, edição e persistência local de produtos.">
+  <title>Controle de Estoque — V5</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="container">
-        <header class="topbar">
-            <div>
-                <p class="eyebrow">GESTÃO SIMPLES E SEGURA</p>
-                <h1>Controle de Estoque</h1>
-            </div>
-            <button type="button" id="btn-conceito-bootstrap" class="btn-secondary">
-                Ver Conceito Bootstrap
-            </button>
-        </header>
-
-        <form id="produto-form" novalidate>
-            <div id="mensagem-erro" class="mensagem-erro" role="alert" aria-live="assertive" tabindex="-1"></div>
-
-            <div class="form-group">
-                <label for="nome">Nome do produto</label>
-                <input type="text" id="nome" list="produtos-sugeridos" autocomplete="off" aria-describedby="mensagem-erro">
-                <datalist id="produtos-sugeridos"></datalist>
-            </div>
-
-            <div class="form-group">
-                <label for="preco">Preço (R$)</label>
-                <input type="number" id="preco" step="0.01" min="0.01" inputmode="decimal" aria-describedby="mensagem-erro">
-            </div>
-
-            <div class="form-group">
-                <label for="quantidade">Quantidade</label>
-                <input type="number" id="quantidade" min="1" step="1" inputmode="numeric" aria-describedby="mensagem-erro">
-            </div>
-
-            <button type="submit" class="btn-primary">Adicionar / Atualizar Produto</button>
-        </form>
-
-        <section class="resumo-container" aria-label="Resumo do estoque">
-            <div>
-                <p class="resumo-label">Valor total em estoque</p>
-                <h2 id="total-estoque">R$ 0,00</h2>
-            </div>
-            <button id="limpar-tabela" class="btn-danger" type="button">Limpar Tudo</button>
-        </section>
-
-        <div class="table-wrap">
-            <table id="tabela-produtos">
-                <thead>
-                    <tr>
-                        <th scope="col">Produto</th>
-                        <th scope="col">Preço un.</th>
-                        <th scope="col">Quantidade</th>
-                        <th scope="col">Subtotal</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <p id="estado-vazio" class="estado-vazio">Nenhum produto cadastrado. Adicione seu primeiro item acima.</p>
+  <main class="container">
+    <header class="topbar">
+      <div class="header-identidade">
+        <div class="molduras-grupo">
+            <div class="molduras-grupo">
+                <div class="moldura-foto">
+                  <img src="v2_" alt="Integrante 1">
+                </div>
+                <div class="moldura-foto">
+                  <img src="foto2.png" alt="Integrante 2">
+                </div>
+              </div>
+              
         </div>
-    </main>
 
-    <div id="modal-confirmacao" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-mensagem">
-        <div class="modal-content">
-            <span class="modal-icon" aria-hidden="true">!</span>
-            <h2 id="modal-titulo">Confirmar ação</h2>
-            <p id="modal-mensagem">Deseja continuar?</p>
-            <div class="modal-actions">
-                <button type="button" id="cancelar-acao" class="btn-secondary">Cancelar</button>
-                <button type="button" id="confirmar-acao" class="btn-danger">Confirmar</button>
-            </div>
+        <div>
+          <p class="eyebrow">GESTÃO SIMPLES E SEGURA</p>
+          <h1>Controle de Estoque</h1>
         </div>
+      </div>
+
+      <button type="button" id="btn-conceito-bootstrap" class="btn-secondary">
+        Ver Conceito Bootstrap
+      </button>
+    </header>
+
+    <form id="produto-form" novalidate>
+      <div id="mensagem-erro" class="mensagem-erro" role="alert" aria-live="assertive" tabindex="-1"></div>
+
+      <div class="form-group">
+        <label for="nome">Nome do produto</label>
+        <input type="text" id="nome" list="produtos-sugeridos" autocomplete="off" aria-describedby="mensagem-erro">
+        <datalist id="produtos-sugeridos"></datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="preco">Preço (R$)</label>
+        <input type="number" id="preco" step="0.01" min="0.01" inputmode="decimal" aria-describedby="mensagem-erro">
+      </div>
+
+      <div class="form-group">
+        <label for="quantidade">Quantidade</label>
+        <input type="number" id="quantidade" min="1" step="1" inputmode="numeric" aria-describedby="mensagem-erro">
+      </div>
+
+      <button type="submit" class="btn-primary">Adicionar / Atualizar Produto</button>
+    </form>
+
+    <section class="resumo-container" aria-label="Resumo do estoque">
+      <div>
+        <p class="resumo-label">Valor total em estoque</p>
+        <h2 id="total-estoque">R$ 0,00</h2>
+      </div>
+      <button id="limpar-tabela" class="btn-danger" type="button">Limpar Tudo</button>
+    </section>
+
+    <div class="table-wrap">
+      <table id="tabela-produtos">
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col">Preço un.</th>
+            <th scope="col">Quantidade</th>
+            <th scope="col">Subtotal</th>
+            <th scope="col">Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="estado-vazio" class="estado-vazio">Nenhum produto cadastrado. Adicione seu primeiro item acima.</p>
     </div>
+  </main>
 
-    <div id="modal-bootstrap" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-bootstrap-titulo">
-        <div class="modal-content modal-bootstrap-content">
-            <p class="eyebrow">COMPONENTE DEMONSTRATIVO</p>
-            <h2 id="modal-bootstrap-titulo">Como o Bootstrap poderia ajudar?</h2>
-            <p>O Bootstrap oferece componentes e estilos prontos que aceleram a construção de interfaces responsivas.</p>
-            <ul>
-                <li><strong>Grid e utilitários:</strong> organizam formulários e tabelas em diferentes telas.</li>
-                <li><strong>Botões e formulários:</strong> ajudam a manter uma aparência consistente.</li>
-                <li><strong>Modal:</strong> oferece uma base pronta para confirmações e mensagens.</li>
-            </ul>
-            <p class="nota-modal">Neste projeto, o visual foi implementado com CSS próprio; o conteúdo demonstra como esses componentes poderiam ser adaptados com Bootstrap.</p>
-            <div class="modal-actions">
-                <button type="button" id="fechar-modal-bootstrap" class="btn-primary">Entendi</button>
-            </div>
-        </div>
+  <div id="modal-confirmacao" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-mensagem">
+    <div class="modal-content">
+      <span class="modal-icon" aria-hidden="true">!</span>
+      <h2 id="modal-titulo">Confirmar ação</h2>
+      <p id="modal-mensagem">Deseja continuar?</p>
+      <div class="modal-actions">
+        <button type="button" id="cancelar-acao" class="btn-secondary">Cancelar</button>
+        <button type="button" id="confirmar-acao" class="btn-danger">Confirmar</button>
+      </div>
     </div>
+  </div>
 
-    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-    <script src="script.js"></script>
+  <div id="modal-bootstrap" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-bootstrap-titulo">
+    <div class="modal-content modal-bootstrap-content">
+      <p class="eyebrow">COMPONENTE DEMONSTRATIVO</p>
+      <h2 id="modal-bootstrap-titulo">Como o Bootstrap poderia ajudar?</h2>
+      <p>O Bootstrap oferece componentes e estilos prontos que aceleram a construção de interfaces responsivas.</p>
+      <ul>
+        <li><strong>Grid e utilitários:</strong> organizam formulários e tabelas em diferentes telas.</li>
+        <li><strong>Botões e formulários:</strong> ajudam a manter uma aparência consistente.</li>
+        <li><strong>Modal:</strong> oferece uma base pronta para confirmações e mensagens.</li>
+      </ul>
+      <p class="nota-modal">Neste projeto, o visual foi implementado com CSS próprio; o conteúdo demonstra como esses componentes poderiam ser adaptados com Bootstrap.</p>
+      <div class="modal-actions">
+        <button type="button" id="fechar-modal-bootstrap" class="btn-primary">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script src="script.js"></script>
 </body>
 </html>
